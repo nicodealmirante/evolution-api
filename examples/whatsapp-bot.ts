@@ -3,6 +3,8 @@ import P from 'pino';
 import OpenAI from 'openai';
 import path from 'path';
 
+// This example requires the OPENAI_API_KEY environment variable to be set.
+
 // categorías posibles
 const CATEGORIES = ['venta', 'alquiler', 'otro'] as const;
 type Category = typeof CATEGORIES[number];
@@ -41,7 +43,11 @@ const PREDEFINED: Record<Category, { text: string; media: any }> = {
 
 // clasifica el mensaje utilizando OpenAI
 async function classifyMessage(text: string): Promise<Category> {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY environment variable is required');
+  }
+  const openai = new OpenAI({ apiKey });
   const response = await openai.responses.create({
     model: 'gpt-4o-mini',
     input: `Clasifica el mensaje como "venta", "alquiler" o "otro": ${text}`
